@@ -17,6 +17,10 @@ const verificationOptions = {
     "algorithms": "RS256"
 }
 
+const request = {
+    authorizationToken: 'Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Ik9PRjRRdFZGZVFHZzdoLWRZcUNKam1lVmVZQkVKZVg2Z04wWTUycFlncVUifQ.eyJmaXJzdF9sb2dpbiI6ZmFsc2UsImp0aSI6IlN6NDhaNmNNM250bExzeFZBMmhyMCIsInN1YiI6ImI1MjZkOWRhLTA2OWMtNGFmZi1hMzFhLTk3MWFkNzZhOWExYiIsImlhdCI6MTY3Nzc3MzY3NSwiZXhwIjoxNjc3Nzc3Mjc1LCJzY29wZSI6Im9wZW5pZCBlbWFpbCBtb2JpbGUiLCJpc3MiOiJodHRwczovL3Bhc3Nwb3J0LXVhdC50aGUxLmNvLnRoIiwiYXVkIjoiZDUxZmM4NWYtZjkxOC00ZjA3LWE3ZmItYTg5NWNkZTZlOGNjIn0.tAEjhaN1hHdQgvSUX4b3NpNZiMskWvXaPhCejmzzI9JHewx-YhUVoHO1s80c6WQau3njncSsv2iRbQMME8Sl8pQNgPzMCV0VX63JQO1WpJw_cAgnOLqt5k2NAiiTxTOj99yy_33FuQdDuPXTJCs9Xn7p3SyyYQIU9ri4_loFTp7J45KBfSkj60AbEzwEgbm_AaRpRafFX0-NiLb9vsFE6O2MHFs2PQnB5XQNFwX02N6he5_ccfNKMeEr5--GvKlreSa8f__fiFwTJQv4GHN1-36tfc8Ut-TTjo86W8jOh9i-PCtuY3PZsuYeQCWF7yEFmFgmHPKhOHZiLhWz7Sr6pg'
+}
+
 function extractTokenFromHeader(event) {
     let token = event.authorizationToken;
     if (!token) throw new Error("Expected 'event.authorizationToken' parametere to be set");
@@ -63,17 +67,22 @@ exports.handler = function (event, context, callback) {
 
     keyClient.getSigningKey(kid, function (err, key) {
         if (err) {
-            callback("Unauthorized");
+            console.log("getSigningKey error:", err);
+            // callback("Unauthorized");
         } else {
             let signingKey = key.publicKey || key.rsaPublicKey;
             console.log("signingKey: " + signingKey)
             jwt.verify(token, signingKey, verificationOptions, function (error) {
                 if (error) {
-                    callback(null, generatePolicy('user', 'Deny', 'event.methodArn', 'event.authorizationToken'));
+                    console.log("jwt verify error: " + error)
+                    //callback(null, generatePolicy('user', 'Deny', 'event.methodArn', 'event.authorizationToken'));
                 } else {
-                    callback(null, generatePolicy('user', 'Allow', 'event.methodArn', event.authorizationToken));
+                    console.log("pass!!!")
+                    //callback(null, generatePolicy('user', 'Allow', 'event.methodArn', event.authorizationToken));
                 }
             })
         }
     })
 }
+
+module.exports.handler();
