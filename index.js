@@ -58,7 +58,7 @@ function generatePolicy(principalId, effect, resource, bearerToken) {
 }
 
 exports.handler = function (event, context, callback) {
-    let token = extractTokenFromHeader(request);
+    let token = extractTokenFromHeader(event);
     let kid = getKidByJwtDecoder(token);
 
     keyClient.getSigningKey(kid, function (err, key) {
@@ -66,12 +66,11 @@ exports.handler = function (event, context, callback) {
             callback("Unauthorized");
         } else {
             let signingKey = key.publicKey || key.rsaPublicKey;
-            console.log("signingKey: " + signingKey)
             jwt.verify(token, signingKey, verificationOptions, function (error) {
                 if (error) {
-                    callback(null, generatePolicy('user', 'Deny', 'event.methodArn', 'event.authorizationToken'));
+                    callback(null, generatePolicy('user', 'Deny', event.methodArn, event.authorizationToken));
                 } else {
-                    callback(null, generatePolicy('user', 'Allow', 'event.methodArn', event.authorizationToken));
+                    callback(null, generatePolicy('user', 'Allow', event.methodArn, event.authorizationToken));
                 }
             })
         }
