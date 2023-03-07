@@ -1,4 +1,9 @@
 # JWT Token Lambda Authorizer
+
+## General
+npm start
+zip -r deploy-nonprod-v2.zip .
+
 ## Overview
 This function uses the `jwks-rsa` and `jsonwebtoken` npm packages to implement token validation of JSON Web Tokens (JWTs). These tokens are granted by ID Providers using the OAuth2 protocol. 
 
