@@ -1,0 +1,17 @@
+{
+  "name": "customer-gateway-authorizer",
+  "version": "1.0.0",
+  "description": "A Lambda Authorizer in NodeJS for JWT access tokens",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "aws-xray-sdk": "^3.4.1",
+    "jsonwebtoken": "^9.0.0",
+    "jwks-rsa": "^3.0.1"
+  }
+}
