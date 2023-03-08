@@ -47,7 +47,7 @@ function generatePolicy(principalId, effect, resource, bearerToken) {
             "Version": "2012-10-17",
             "Statement": [
                 {
-                    "Action": "lambda:InvokeFunction",
+                    "Action": "execute-api:Invoke",
                     "Effect": effect,
                     "Resource": resource
                 }
