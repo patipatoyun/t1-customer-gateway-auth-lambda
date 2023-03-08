@@ -40,7 +40,7 @@ function generatePolicy(principalId, effect, resource, bearerToken) {
     let authResponse = {
         "principalId": principalId,
         "policyDocument": {
-            "Version": "2023-13-10",
+            "Version": "2012-10-17",
             "Statement": [
                 {
                     "Action": "execute-api:Invoke",
