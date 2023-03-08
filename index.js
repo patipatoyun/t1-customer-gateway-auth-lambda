@@ -44,10 +44,10 @@ function generatePolicy(principalId, effect, resource, bearerToken) {
     let authResponse = {
         "principalId": principalId,
         "policyDocument": {
-            "Version": "2023-13-10",
+            "Version": "2012-10-17",
             "Statement": [
                 {
-                    "Action": "execute-api:Invoke",
+                    "Action": "lambda:InvokeFunction",
                     "Effect": effect,
                     "Resource": resource
                 }
@@ -71,7 +71,7 @@ exports.handler = function (event, context, callback) {
             // callback("Unauthorized");
         } else {
             let signingKey = key.publicKey || key.rsaPublicKey;
-            console.log("signingKey: " + signingKey)
+            console.log("signingKey: " + signingKey);
             jwt.verify(token, signingKey, verificationOptions, function (error) {
                 if (error) {
                     console.log("jwt verify error: " + error)
