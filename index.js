@@ -17,26 +17,27 @@ const verificationOptions = {
     "algorithms": "RS256"
 }
 
-function extractTokenFromHeader(event) {
+function extractTokenFromHeader(event, callback) {
     let token = event.authorizationToken;
-    if (!token) throw new Error("Expected 'event.authorizationToken' parametere to be set");
-
     let match = token.match(/^Bearer (.*)$/);
-    if (!match || match.length < 2) throw new Error("Invalid Authorization token -" + token + " does not match the bearer");
-
+    if (!token || !match || match.length < 2) {
+        console.log('extractTokenFromHeader excepton: ' + token);
+        callback("Unauthorized")
+    }
     return match[1];
 }
 
-function getKidByJwtDecoder(token) {
+function getKidByJwtDecoder(token, callback) {
     try {
         let decoded = jwt.decode(token, { complete: true });
         return decoded.header.kid;
     } catch (error) {
-        throw new Error("JwtDecoder error: " + error);
+        console.log("JwtDecoder error:", error);
+        callback("Unauthorized");
     }
 }
 
-function generatePolicy(principalId, effect, resource, bearerToken) {
+function generatePolicy(principalId, effect, resource, accessToken, errorMessage) {
     let authResponse = {
         "principalId": principalId,
         "policyDocument": {
@@ -51,15 +52,23 @@ function generatePolicy(principalId, effect, resource, bearerToken) {
         }
     }
     authResponse.context = {
-        "name": bearerToken
+        "token": accessToken,
+        "errorMessage": errorMessage || null
     };
     console.log("generate policy success: ", authResponse.principalId);
     return authResponse;
 }
 
+function errorMsgDenyPolicy(error) {
+    switch (true) {
+        case error instanceof jwt.TokenExpiredError: return "Token expired";
+        default: return "Token invalid";
+    }
+}
+
 exports.handler = function (event, context, callback) {
-    let token = extractTokenFromHeader(event);
-    let kid = getKidByJwtDecoder(token);
+    let token = extractTokenFromHeader(event, callback);
+    let kid = getKidByJwtDecoder(token, callback);
 
     keyClient.getSigningKey(kid, function (err, key) {
         if (err) {
@@ -68,7 +77,7 @@ exports.handler = function (event, context, callback) {
             let signingKey = key.publicKey || key.rsaPublicKey;
             jwt.verify(token, signingKey, verificationOptions, function (error) {
                 if (error) {
-                    callback(null, generatePolicy('user', 'Deny', event.methodArn, event.authorizationToken));
+                    callback(null, generatePolicy('user', 'Deny', event.methodArn, event.authorizationToken, errorMsgDenyPolicy(error)));
                 } else {
                     callback(null, generatePolicy('user', 'Allow', event.methodArn, event.authorizationToken));
                 }
