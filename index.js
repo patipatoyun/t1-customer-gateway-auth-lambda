@@ -21,7 +21,7 @@ function extractTokenFromHeader(event, callback) {
     let token = event.authorizationToken;
     let match = token.match(/^Bearer (.*)$/);
     if (!token || !match || match.length < 2) {
-        console.log('extractTokenFromHeader excepton: ' + token);
+        console.log('extractTokenFromHeader error: ' + token);
         callback("Unauthorized")
     }
     return match[1];
@@ -55,7 +55,7 @@ function generatePolicy(principalId, effect, resource, accessToken, errorMessage
         "token": accessToken,
         "errorMessage": errorMessage || null
     };
-    console.log("generate policy success: ", authResponse.principalId);
+    console.log("generate policy ", effect, " : ", authResponse.principalId);
     return authResponse;
 }
 
