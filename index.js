@@ -8,7 +8,10 @@ const keyClient = jwksClient({
     rateLimit: true,
     jwksRequestsPerMinute: 10,
     strictSsl: true,
-    jwksUri: JWKS_URI
+    jwksUri: JWKS_URI,
+    requestHeaders: {
+        'user-agent': 'AWSAuthorizer'
+    }
 })
 
 const verificationOptions = {
