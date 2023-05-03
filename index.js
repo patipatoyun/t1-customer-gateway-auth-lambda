@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const jwksClient = require('jwks-rsa');
-const JWKS_UAT_URI = 'https://passport-uat.the1.co.th/jwks'
+const JWKS_URI = 'https://the1-corporate-iam.cloud-iam.com/auth/realms/integration-np/protocol/openid-connect/certs'
 
 const keyClient = jwksClient({
     cache: true,
@@ -8,7 +8,7 @@ const keyClient = jwksClient({
     rateLimit: true,
     jwksRequestsPerMinute: 10,
     strictSsl: true,
-    jwksUri: JWKS_UAT_URI
+    jwksUri: JWKS_URI
 })
 
 const verificationOptions = {
